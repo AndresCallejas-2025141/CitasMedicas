@@ -1,0 +1,16 @@
+{
+  "name": "gestion-citas-medicas",
+  "version": "1.0.0",
+  "description": "Backend Gestión de Citas Médicas",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3"
+  }
+}
