@@ -1,4 +1,4 @@
-import { conexion } from "./config/conexion";
+import { conexion } from "./config/database";
 
 async function iniciar() {
     try {
@@ -8,7 +8,7 @@ async function iniciar() {
 
         connection.release();
     } catch (error) {
-        console.error("❌ Error al conectar con la base de datos:");
+        console.error("❌ Error al conectar a la base de datos:");
         console.error(error);
     }
 }
