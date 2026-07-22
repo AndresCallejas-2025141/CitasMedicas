@@ -5,6 +5,7 @@ import { mostrarMenu } from "./menu";
 
 const consultorioService = new ConsultorioService();
 
+
 export function menuConsultorios(): void {
 
     console.clear();
@@ -19,7 +20,6 @@ export function menuConsultorios(): void {
     console.log("5. Eliminar consultorio");
     console.log("0. Regresar");
     console.log("====================================");
-
     rl.question("Seleccione una opción: ", async (opcion) => {
 
         switch (opcion) {
@@ -49,7 +49,7 @@ export function menuConsultorios(): void {
                 break;
 
             default:
-                console.log("\nOpción inválida.");
+                console.log("Opción inválida.");
                 setTimeout(menuConsultorios, 1500);
                 break;
         }
@@ -62,11 +62,27 @@ function agregarConsultorio(): void {
 
     console.clear();
 
+
     rl.question("Número del consultorio: ", (numero) => {
+
 
         rl.question("Ubicación: ", async (ubicacion) => {
 
+
+            if (
+                numero.trim() === "" ||
+                ubicacion.trim() === ""
+            ) {
+
+                console.log("Error: No se permiten campos vacíos.");
+                volverMenuConsultorios();
+                return;
+
+            }
+
+
             try {
+
 
                 const consultorio = new Consultorio(
                     0,
@@ -74,9 +90,12 @@ function agregarConsultorio(): void {
                     ubicacion
                 );
 
+
                 await consultorioService.agregar(consultorio);
 
-                console.log("\nConsultorio agregado correctamente.");
+
+                console.log("Consultorio agregado correctamente.");
+
 
             } catch (error) {
 
@@ -84,9 +103,12 @@ function agregarConsultorio(): void {
 
             }
 
+
             volverMenuConsultorios();
 
+
         });
+
 
     });
 
@@ -96,17 +118,20 @@ async function listarConsultorios(): Promise<void> {
 
     console.clear();
 
+
     try {
 
         const resultado = await consultorioService.listar();
 
         console.table(resultado[0]);
 
+
     } catch (error) {
 
         console.error(error);
 
     }
+
 
     volverMenuConsultorios();
 
@@ -116,13 +141,44 @@ function buscarConsultorio(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del consultorio: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuConsultorios();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuConsultorios();
+            return;
+
+        }
+
 
         try {
 
+
             const resultado = await consultorioService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Consultorio no encontrado.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
+
 
         } catch (error) {
 
@@ -130,7 +186,9 @@ function buscarConsultorio(): void {
 
         }
 
+
         volverMenuConsultorios();
+
 
     });
 
@@ -140,13 +198,40 @@ function editarConsultorio(): void {
 
     console.clear();
 
+
     rl.question("ID: ", (id) => {
+
 
         rl.question("Número: ", (numero) => {
 
+
             rl.question("Ubicación: ", async (ubicacion) => {
 
+
+                if (
+                    id.trim() === "" ||
+                    numero.trim() === "" ||
+                    ubicacion.trim() === ""
+                ) {
+
+                    console.log("Error: No se permiten campos vacíos.");
+                    volverMenuConsultorios();
+                    return;
+
+                }
+
+
+                if (isNaN(Number(id))) {
+
+                    console.log("Error: El ID debe ser numérico.");
+                    volverMenuConsultorios();
+                    return;
+
+                }
+
+
                 try {
+
 
                     const consultorio = new Consultorio(
                         Number(id),
@@ -154,9 +239,12 @@ function editarConsultorio(): void {
                         ubicacion
                     );
 
+
                     await consultorioService.editar(consultorio);
 
-                    console.log("\nConsultorio actualizado correctamente.");
+
+                    console.log("Consultorio actualizado correctamente.");
+
 
                 } catch (error) {
 
@@ -164,11 +252,15 @@ function editarConsultorio(): void {
 
                 }
 
+
                 volverMenuConsultorios();
+
 
             });
 
+
         });
+
 
     });
 
@@ -178,13 +270,36 @@ function eliminarConsultorio(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del consultorio: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuConsultorios();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuConsultorios();
+            return;
+
+        }
+
 
         try {
 
+
             await consultorioService.eliminar(Number(id));
 
-            console.log("\nConsultorio eliminado correctamente.");
+
+            console.log("Consultorio eliminado correctamente.");
+
 
         } catch (error) {
 
@@ -192,7 +307,9 @@ function eliminarConsultorio(): void {
 
         }
 
+
         volverMenuConsultorios();
+
 
     });
 
@@ -200,7 +317,7 @@ function eliminarConsultorio(): void {
 
 function volverMenuConsultorios(): void {
 
-    rl.question("\nPresione ENTER para continuar...", () => {
+    rl.question("Presione ENTER para continuar...", () => {
 
         menuConsultorios();
 
