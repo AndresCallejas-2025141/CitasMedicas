@@ -1,0 +1,219 @@
+import { rl } from "../readline";
+import { Paciente } from "../models/paciente";
+import { PacienteService } from "../services/pacienteService";
+import { mostrarMenu } from "./menu";
+
+const pacienteService = new PacienteService();
+
+export function menuPacientes(): void {
+
+    console.clear();
+
+    console.log("====================================");
+    console.log("        MENÚ PACIENTES");
+    console.log("====================================");
+    console.log("1. Agregar paciente");
+    console.log("2. Listar pacientes");
+    console.log("3. Buscar paciente");
+    console.log("4. Editar paciente");
+    console.log("5. Eliminar paciente");
+    console.log("0. Regresar");
+    console.log("====================================");
+
+    rl.question("Seleccione una opción: ", async (opcion) => {
+
+        switch (opcion) {
+
+            case "1":
+                agregarPaciente();
+                break;
+
+            case "2":
+                await listarPacientes();
+                break;
+
+            case "3":
+                buscarPaciente();
+                break;
+
+            case "4":
+                editarPaciente();
+                break;
+
+            case "5":
+                eliminarPaciente();
+                break;
+
+            case "0":
+                mostrarMenu();
+                break;
+
+            default:
+                console.log("\nOpción inválida.");
+                setTimeout(menuPacientes, 1500);
+                break;
+        }
+
+    });
+
+}
+
+function agregarPaciente(): void {
+
+    console.clear();
+
+    rl.question("Nombre: ", (nombre) => {
+
+        rl.question("Teléfono: ", (telefono) => {
+
+            rl.question("Correo: ", async (correo) => {
+
+                try {
+
+                    const paciente = new Paciente(
+                        0,
+                        nombre,
+                        telefono,
+                        correo
+                    );
+
+                    await pacienteService.agregar(paciente);
+
+                    console.log("\nPaciente agregado correctamente.");
+
+                } catch (error) {
+
+                    console.error(error);
+
+                }
+
+                volverMenuPacientes();
+
+            });
+
+        });
+
+    });
+
+}
+
+async function listarPacientes(): Promise<void> {
+
+    console.clear();
+
+    try {
+
+        const resultado = await pacienteService.listar();
+
+        console.table(resultado[0]);
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    volverMenuPacientes();
+
+}
+
+function buscarPaciente(): void {
+
+    console.clear();
+
+    rl.question("Ingrese el ID del paciente: ", async (id) => {
+
+        try {
+
+            const resultado = await pacienteService.buscarPorId(Number(id));
+
+            console.table(resultado[0]);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+        volverMenuPacientes();
+
+    });
+
+}
+
+function editarPaciente(): void {
+
+    console.clear();
+
+    rl.question("ID: ", (id) => {
+
+        rl.question("Nombre: ", (nombre) => {
+
+            rl.question("Teléfono: ", (telefono) => {
+
+                rl.question("Correo: ", async (correo) => {
+
+                    try {
+
+                        const paciente = new Paciente(
+                            Number(id),
+                            nombre,
+                            telefono,
+                            correo
+                        );
+
+                        await pacienteService.editar(paciente);
+
+                        console.log("\nPaciente actualizado correctamente.");
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                    }
+
+                    volverMenuPacientes();
+
+                });
+
+            });
+
+        });
+
+    });
+
+}
+
+function eliminarPaciente(): void {
+
+    console.clear();
+
+    rl.question("Ingrese el ID del paciente: ", async (id) => {
+
+        try {
+
+            await pacienteService.eliminar(Number(id));
+
+            console.log("\nPaciente eliminado correctamente.");
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+        volverMenuPacientes();
+
+    });
+
+}
+
+function volverMenuPacientes(): void {
+
+    rl.question("\nPresione ENTER para continuar...", () => {
+
+        menuPacientes();
+
+    });
+
+}
