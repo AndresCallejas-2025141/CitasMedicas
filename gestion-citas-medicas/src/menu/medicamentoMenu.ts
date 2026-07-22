@@ -5,6 +5,7 @@ import { mostrarMenu } from "./menu";
 
 const medicamentoService = new MedicamentoService();
 
+
 export function menuMedicamentos(): void {
 
     console.clear();
@@ -19,8 +20,8 @@ export function menuMedicamentos(): void {
     console.log("5. Eliminar medicamento");
     console.log("0. Regresar");
     console.log("====================================");
-
     rl.question("Seleccione una opción: ", async (opcion) => {
+
 
         switch (opcion) {
 
@@ -52,6 +53,7 @@ export function menuMedicamentos(): void {
                 console.log("Opción inválida.");
                 setTimeout(menuMedicamentos, 1500);
                 break;
+
         }
 
     });
@@ -62,13 +64,39 @@ function agregarMedicamento(): void {
 
     console.clear();
 
+
     rl.question("Nombre: ", (nombre) => {
+
 
         rl.question("Dosis: ", (dosis) => {
 
+
             rl.question("ID de la receta: ", async (idReceta) => {
 
+
+                if (
+                    nombre.trim() === "" ||
+                    dosis.trim() === "" ||
+                    idReceta.trim() === ""
+                ) {
+
+                    console.log("Error: No se permiten campos vacíos.");
+                    volverMenuMedicamentos();
+                    return;
+
+                }
+
+
+                if (isNaN(Number(idReceta))) {
+
+                    console.log("Error: El ID de la receta debe ser numérico.");
+                    volverMenuMedicamentos();
+                    return;
+
+                }
+
                 try {
+
 
                     const medicamento = new Medicamento(
                         0,
@@ -77,9 +105,12 @@ function agregarMedicamento(): void {
                         Number(idReceta)
                     );
 
+
                     await medicamentoService.agregar(medicamento);
 
+
                     console.log("Medicamento agregado correctamente.");
+
 
                 } catch (error) {
 
@@ -87,19 +118,26 @@ function agregarMedicamento(): void {
 
                 }
 
+
                 volverMenuMedicamentos();
+
 
             });
 
+
         });
+
 
     });
 
 }
 
+
+
 async function listarMedicamentos(): Promise<void> {
 
     console.clear();
+
 
     try {
 
@@ -107,11 +145,13 @@ async function listarMedicamentos(): Promise<void> {
 
         console.table(resultado[0]);
 
+
     } catch (error) {
 
         console.error(error);
 
     }
+
 
     volverMenuMedicamentos();
 
@@ -121,13 +161,43 @@ function buscarMedicamento(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del medicamento: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuMedicamentos();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuMedicamentos();
+            return;
+
+        }
 
         try {
 
+
             const resultado = await medicamentoService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Medicamento no encontrado.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
+
 
         } catch (error) {
 
@@ -135,7 +205,9 @@ function buscarMedicamento(): void {
 
         }
 
+
         volverMenuMedicamentos();
+
 
     });
 
@@ -145,15 +217,47 @@ function editarMedicamento(): void {
 
     console.clear();
 
+
     rl.question("ID del medicamento: ", (id) => {
+
 
         rl.question("Nombre: ", (nombre) => {
 
+
             rl.question("Dosis: ", (dosis) => {
+
 
                 rl.question("ID de la receta: ", async (idReceta) => {
 
+
+                    if (
+                        id.trim() === "" ||
+                        nombre.trim() === "" ||
+                        dosis.trim() === "" ||
+                        idReceta.trim() === ""
+                    ) {
+
+                        console.log("Error: No se permiten campos vacíos.");
+                        volverMenuMedicamentos();
+                        return;
+
+                    }
+
+
+                    if (
+                        isNaN(Number(id)) ||
+                        isNaN(Number(idReceta))
+                    ) {
+
+                        console.log("Error: Los IDs deben ser numéricos.");
+                        volverMenuMedicamentos();
+                        return;
+
+                    }
+
+
                     try {
+
 
                         const medicamento = new Medicamento(
                             Number(id),
@@ -162,9 +266,12 @@ function editarMedicamento(): void {
                             Number(idReceta)
                         );
 
+
                         await medicamentoService.editar(medicamento);
 
+
                         console.log("Medicamento actualizado correctamente.");
+
 
                     } catch (error) {
 
@@ -172,13 +279,18 @@ function editarMedicamento(): void {
 
                     }
 
+
                     volverMenuMedicamentos();
+
 
                 });
 
+
             });
 
+
         });
+
 
     });
 
@@ -188,13 +300,36 @@ function eliminarMedicamento(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del medicamento: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuMedicamentos();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuMedicamentos();
+            return;
+
+        }
+
 
         try {
 
+
             await medicamentoService.eliminar(Number(id));
 
+
             console.log("Medicamento eliminado correctamente.");
+
 
         } catch (error) {
 
@@ -202,7 +337,9 @@ function eliminarMedicamento(): void {
 
         }
 
+
         volverMenuMedicamentos();
+
 
     });
 
