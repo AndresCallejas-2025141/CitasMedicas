@@ -5,6 +5,7 @@ import { mostrarMenu } from "./menu";
 
 const horarioService = new HorarioService();
 
+
 export function menuHorarios(): void {
 
     console.clear();
@@ -19,8 +20,8 @@ export function menuHorarios(): void {
     console.log("5. Eliminar horario");
     console.log("0. Regresar");
     console.log("====================================");
-
     rl.question("Seleccione una opción: ", async (opcion) => {
+
 
         switch (opcion) {
 
@@ -63,13 +64,48 @@ function agregarHorario(): void {
 
     console.clear();
 
+
     rl.question("Día: ", (dia) => {
 
         rl.question("Hora de inicio (HH:MM:SS): ", (horaInicio) => {
 
+
             rl.question("Hora de fin (HH:MM:SS): ", (horaFin) => {
 
+
                 rl.question("ID del doctor: ", async (idDoctor) => {
+
+
+                    if (
+                        dia.trim() === "" ||
+                        horaInicio.trim() === "" ||
+                        horaFin.trim() === "" ||
+                        idDoctor.trim() === ""
+                    ) {
+
+                        console.log("Error: No se permiten campos vacíos.");
+                        volverMenuHorarios();
+                        return;
+
+                    }
+
+                    if (isNaN(Number(idDoctor))) {
+
+                        console.log("Error: El ID del doctor debe ser numérico.");
+                        volverMenuHorarios();
+                        return;
+
+                    }
+
+
+                    if (!validarHora(horaInicio) || !validarHora(horaFin)) {
+
+                        console.log("Error: Formato de hora inválido.");
+                        volverMenuHorarios();
+                        return;
+
+                    }
+
 
                     try {
 
@@ -81,9 +117,12 @@ function agregarHorario(): void {
                             Number(idDoctor)
                         );
 
+
                         await horarioService.agregar(horario);
 
+
                         console.log("Horario agregado correctamente.");
+
 
                     } catch (error) {
 
@@ -91,13 +130,18 @@ function agregarHorario(): void {
 
                     }
 
+
                     volverMenuHorarios();
+
 
                 });
 
+
             });
 
+
         });
+
 
     });
 
@@ -107,17 +151,20 @@ async function listarHorarios(): Promise<void> {
 
     console.clear();
 
+
     try {
 
         const resultado = await horarioService.listar();
 
         console.table(resultado[0]);
 
+
     } catch (error) {
 
         console.error(error);
 
     }
+
 
     volverMenuHorarios();
 
@@ -127,13 +174,43 @@ function buscarHorario(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del horario: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuHorarios();
+            return;
+
+        }
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuHorarios();
+            return;
+
+        }
+
 
         try {
 
+
             const resultado = await horarioService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Horario no encontrado.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
+
 
         } catch (error) {
 
@@ -141,7 +218,9 @@ function buscarHorario(): void {
 
         }
 
+
         volverMenuHorarios();
+
 
     });
 
@@ -151,17 +230,60 @@ function editarHorario(): void {
 
     console.clear();
 
+
     rl.question("ID del horario: ", (id) => {
+
 
         rl.question("Día: ", (dia) => {
 
+
             rl.question("Hora de inicio (HH:MM:SS): ", (horaInicio) => {
+
 
                 rl.question("Hora de fin (HH:MM:SS): ", (horaFin) => {
 
+
                     rl.question("ID del doctor: ", async (idDoctor) => {
 
+
+                        if (
+                            id.trim() === "" ||
+                            dia.trim() === "" ||
+                            horaInicio.trim() === "" ||
+                            horaFin.trim() === "" ||
+                            idDoctor.trim() === ""
+                        ) {
+
+                            console.log("Error: No se permiten campos vacíos.");
+                            volverMenuHorarios();
+                            return;
+
+                        }
+
+
+                        if (
+                            isNaN(Number(id)) ||
+                            isNaN(Number(idDoctor))
+                        ) {
+
+                            console.log("Error: Los IDs deben ser numéricos.");
+                            volverMenuHorarios();
+                            return;
+
+                        }
+
+
+                        if (!validarHora(horaInicio) || !validarHora(horaFin)) {
+
+                            console.log("Error: Formato de hora inválido.");
+                            volverMenuHorarios();
+                            return;
+
+                        }
+
+
                         try {
+
 
                             const horario = new Horario(
                                 Number(id),
@@ -171,9 +293,12 @@ function editarHorario(): void {
                                 Number(idDoctor)
                             );
 
+
                             await horarioService.editar(horario);
 
+
                             console.log("Horario actualizado correctamente.");
+
 
                         } catch (error) {
 
@@ -181,15 +306,21 @@ function editarHorario(): void {
 
                         }
 
+
                         volverMenuHorarios();
+
 
                     });
 
+
                 });
+
 
             });
 
+
         });
+
 
     });
 
@@ -199,13 +330,36 @@ function eliminarHorario(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del horario: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuHorarios();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuHorarios();
+            return;
+
+        }
+
 
         try {
 
+
             await horarioService.eliminar(Number(id));
 
+
             console.log("Horario eliminado correctamente.");
+
 
         } catch (error) {
 
@@ -213,9 +367,19 @@ function eliminarHorario(): void {
 
         }
 
+
         volverMenuHorarios();
 
+
     });
+
+}
+
+function validarHora(hora: string): boolean {
+
+    const formato = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+
+    return formato.test(hora);
 
 }
 
