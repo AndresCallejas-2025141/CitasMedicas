@@ -19,23 +19,21 @@ export class DoctorService {
 
     async agregar(doctor: Doctor): Promise<void> {
         await conexion.query(
-            "CALL agregar_doctor(?,?,?)",
+            "CALL agregar_doctor(?,?)",
             [
                 doctor.nombre,
-                doctor.especialidadId,
-                doctor.idDoctor
+                doctor.especialidadId
             ]
         );
     }
 
     async editar(doctor: Doctor): Promise<void> {
         await conexion.query(
-            "CALL editar_doctor(?,?,?,?)",
+            "CALL editar_doctor(?,?,?)",
             [
                 doctor.idDoctor,
                 doctor.nombre,
-                doctor.especialidadId,
-                doctor.idDoctor
+                doctor.especialidadId
             ]
         );
     }
