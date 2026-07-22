@@ -20,8 +20,6 @@ export function menuHistorial(): void {
     console.log("5. Eliminar historial");
     console.log("0. Regresar");
     console.log("====================================");
-
-
     rl.question("Seleccione una opción: ", async (opcion) => {
 
         switch (opcion) {
@@ -60,8 +58,6 @@ export function menuHistorial(): void {
 
 }
 
-
-
 function agregarHistorial(): void {
 
     console.clear();
@@ -69,10 +65,33 @@ function agregarHistorial(): void {
 
     rl.question("Descripción: ", (descripcion) => {
 
+
         rl.question("ID del paciente: ", async (idPaciente) => {
 
 
+            if (
+                descripcion.trim() === "" ||
+                idPaciente.trim() === ""
+            ) {
+
+                console.log("Error: No se permiten campos vacíos.");
+                volverMenuHistorial();
+                return;
+
+            }
+
+
+            if (isNaN(Number(idPaciente))) {
+
+                console.log("Error: El ID del paciente debe ser numérico.");
+                volverMenuHistorial();
+                return;
+
+            }
+
+
             try {
+
 
                 const historial = new Historial(
                     0,
@@ -96,13 +115,13 @@ function agregarHistorial(): void {
 
             volverMenuHistorial();
 
+
         });
+
 
     });
 
 }
-
-
 
 async function listarHistoriales(): Promise<void> {
 
@@ -127,8 +146,6 @@ async function listarHistoriales(): Promise<void> {
 
 }
 
-
-
 function buscarHistorial(): void {
 
     console.clear();
@@ -137,11 +154,39 @@ function buscarHistorial(): void {
     rl.question("Ingrese el ID del historial: ", async (id) => {
 
 
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuHistorial();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuHistorial();
+            return;
+
+        }
+
+
         try {
+
 
             const resultado = await historialService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Historial no encontrado.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
 
 
         } catch (error) {
@@ -158,8 +203,6 @@ function buscarHistorial(): void {
 
 }
 
-
-
 function editarHistorial(): void {
 
     console.clear();
@@ -172,6 +215,31 @@ function editarHistorial(): void {
 
 
             rl.question("ID del paciente: ", async (idPaciente) => {
+
+
+                if (
+                    idHistorial.trim() === "" ||
+                    descripcion.trim() === "" ||
+                    idPaciente.trim() === ""
+                ) {
+
+                    console.log("Error: No se permiten campos vacíos.");
+                    volverMenuHistorial();
+                    return;
+
+                }
+
+
+                if (
+                    isNaN(Number(idHistorial)) ||
+                    isNaN(Number(idPaciente))
+                ) {
+
+                    console.log("Error: Los IDs deben ser numéricos.");
+                    volverMenuHistorial();
+                    return;
+
+                }
 
 
                 try {
@@ -210,8 +278,6 @@ function editarHistorial(): void {
 
 }
 
-
-
 function eliminarHistorial(): void {
 
     console.clear();
@@ -220,7 +286,26 @@ function eliminarHistorial(): void {
     rl.question("Ingrese el ID del historial: ", async (id) => {
 
 
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuHistorial();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuHistorial();
+            return;
+
+        }
+
+
         try {
+
 
             await historialService.eliminar(Number(id));
 
@@ -241,8 +326,6 @@ function eliminarHistorial(): void {
     });
 
 }
-
-
 
 function volverMenuHistorial(): void {
 
