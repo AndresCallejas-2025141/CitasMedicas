@@ -49,7 +49,7 @@ export function menuPacientes(): void {
                 break;
 
             default:
-                console.log("\nOpción inválida.");
+                console.log("Opción inválida.");
                 setTimeout(menuPacientes, 1500);
                 break;
         }
@@ -79,7 +79,7 @@ function agregarPaciente(): void {
 
                     await pacienteService.agregar(paciente);
 
-                    console.log("\nPaciente agregado correctamente.");
+                    console.log("Paciente agregado correctamente.");
 
                 } catch (error) {
 
@@ -194,7 +194,7 @@ function eliminarPaciente(): void {
 
             await pacienteService.eliminar(Number(id));
 
-            console.log("\nPaciente eliminado correctamente.");
+            console.log("Paciente eliminado correctamente.");
 
         } catch (error) {
 
@@ -210,7 +210,7 @@ function eliminarPaciente(): void {
 
 function volverMenuPacientes(): void {
 
-    rl.question("\nPresione ENTER para continuar...", () => {
+    rl.question("Presione ENTER para continuar...", () => {
 
         menuPacientes();
 
