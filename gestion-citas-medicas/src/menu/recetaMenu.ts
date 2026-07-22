@@ -5,6 +5,7 @@ import { mostrarMenu } from "./menu";
 
 const recetaService = new RecetaService();
 
+
 export function menuRecetas(): void {
 
     console.clear();
@@ -19,8 +20,8 @@ export function menuRecetas(): void {
     console.log("5. Eliminar receta");
     console.log("0. Regresar");
     console.log("====================================");
-
     rl.question("Seleccione una opción: ", async (opcion) => {
+
 
         switch (opcion) {
 
@@ -63,21 +64,61 @@ function agregarReceta(): void {
 
     console.clear();
 
+
     rl.question("Fecha (YYYY-MM-DD): ", (fecha) => {
+
 
         rl.question("ID de la cita: ", async (idCita) => {
 
+
+            if (
+                fecha.trim() === "" ||
+                idCita.trim() === ""
+            ) {
+
+                console.log("Error: No se permiten campos vacíos.");
+                volverMenuRecetas();
+                return;
+
+            }
+
+
+            if (isNaN(Number(idCita))) {
+
+                console.log("Error: El ID de la cita debe ser numérico.");
+                volverMenuRecetas();
+                return;
+
+            }
+
+
+            const fechaValida = new Date(fecha);
+
+
+            if (isNaN(fechaValida.getTime())) {
+
+                console.log("Error: La fecha ingresada no es válida.");
+                volverMenuRecetas();
+                return;
+
+            }
+
+
             try {
+
 
                 const receta = new Receta(
                     0,
-                    new Date(fecha),
+                    fechaValida,
                     Number(idCita)
                 );
 
+
                 await recetaService.agregar(receta);
 
+
                 console.log("Receta agregada correctamente.");
+
 
             } catch (error) {
 
@@ -85,9 +126,12 @@ function agregarReceta(): void {
 
             }
 
+
             volverMenuRecetas();
 
+
         });
+
 
     });
 
@@ -97,17 +141,22 @@ async function listarRecetas(): Promise<void> {
 
     console.clear();
 
+
     try {
+
 
         const resultado = await recetaService.listar();
 
+
         console.table(resultado[0]);
+
 
     } catch (error) {
 
         console.error(error);
 
     }
+
 
     volverMenuRecetas();
 
@@ -117,13 +166,44 @@ function buscarReceta(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID de la receta: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuRecetas();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuRecetas();
+            return;
+
+        }
+
 
         try {
 
+
             const resultado = await recetaService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Receta no encontrada.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
+
 
         } catch (error) {
 
@@ -131,7 +211,9 @@ function buscarReceta(): void {
 
         }
 
+
         volverMenuRecetas();
+
 
     });
 
@@ -141,23 +223,67 @@ function editarReceta(): void {
 
     console.clear();
 
+
     rl.question("ID de la receta: ", (id) => {
+
 
         rl.question("Fecha (YYYY-MM-DD): ", (fecha) => {
 
+
             rl.question("ID de la cita: ", async (idCita) => {
+
+
+                if (
+                    id.trim() === "" ||
+                    fecha.trim() === "" ||
+                    idCita.trim() === ""
+                ) {
+
+                    console.log("Error: No se permiten campos vacíos.");
+                    volverMenuRecetas();
+                    return;
+
+                }
+
+
+                if (
+                    isNaN(Number(id)) ||
+                    isNaN(Number(idCita))
+                ) {
+
+                    console.log("Error: Los IDs deben ser números.");
+                    volverMenuRecetas();
+                    return;
+
+                }
+
+                const fechaValida = new Date(fecha);
+
+
+                if (isNaN(fechaValida.getTime())) {
+
+                    console.log("Error: Fecha inválida.");
+                    volverMenuRecetas();
+                    return;
+
+                }
+
 
                 try {
 
+
                     const receta = new Receta(
                         Number(id),
-                        new Date(fecha),
+                        fechaValida,
                         Number(idCita)
                     );
 
+
                     await recetaService.editar(receta);
 
+
                     console.log("Receta actualizada correctamente.");
+
 
                 } catch (error) {
 
@@ -167,9 +293,12 @@ function editarReceta(): void {
 
                 volverMenuRecetas();
 
+
             });
 
+
         });
+
 
     });
 
@@ -179,13 +308,35 @@ function eliminarReceta(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID de la receta: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuRecetas();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuRecetas();
+            return;
+
+        }
 
         try {
 
+
             await recetaService.eliminar(Number(id));
 
+
             console.log("Receta eliminada correctamente.");
+
 
         } catch (error) {
 
@@ -193,7 +344,9 @@ function eliminarReceta(): void {
 
         }
 
+
         volverMenuRecetas();
+
 
     });
 
