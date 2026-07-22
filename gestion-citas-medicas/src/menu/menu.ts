@@ -1,6 +1,14 @@
 import { rl } from "../readline";
 import { menuPacientes } from "./pacienteMenu";
 import { menuDoctores } from "./doctorMenu";
+import { menuEspecialidades } from "./especialidadMenu";
+import { menuConsultorios } from "./consultorioMenu";
+import { menuCitas } from "./citasMenu";
+import { menuHorarios } from "./horarioMenu";
+import { menuRecetas } from "./recetaMenu";
+import { menuMedicamentos } from "./medicamentoMenu";
+import { menuPagos } from "./pagoMenu";
+import { menuHistorial } from "./historialMenu";
 
 export function mostrarMenu(): void {
 
@@ -35,39 +43,39 @@ export function mostrarMenu(): void {
                 break;
 
             case "3":
-                console.log("Menú Especialidades");
+                menuEspecialidades();
                 break;
 
             case "4":
-                console.log("Menú Consultorios");
+                menuConsultorios();
                 break;
 
             case "5":
-                console.log("Menú Citas");
+                menuCitas();
                 break;
 
             case "6":
-                console.log("Menú Horarios");
+                menuHorarios();
                 break;
 
             case "7":
-                console.log("Menú Recetas");
+                menuRecetas();
                 break;
 
             case "8":
-                console.log("Menú Medicamentos");
+                menuMedicamentos();
                 break;
 
             case "9":
-                console.log("Menú Pagos");
+                menuPagos();
                 break;
 
             case "10":
-                console.log("Menú Historial");
+                menuHistorial();
                 break;
 
             case "0":
-                console.log("\n¡Gracias por utilizar el sistema!");
+                console.log("¡Gracias por utilizar el sistema!");
                 rl.close();
                 return;
 
