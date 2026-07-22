@@ -20,8 +20,6 @@ export function menuPagos(): void {
     console.log("5. Eliminar pago");
     console.log("0. Regresar");
     console.log("====================================");
-
-
     rl.question("Seleccione una opción: ", async (opcion) => {
 
         switch (opcion) {
@@ -60,8 +58,6 @@ export function menuPagos(): void {
 
 }
 
-
-
 function agregarPago(): void {
 
     console.clear();
@@ -69,17 +65,57 @@ function agregarPago(): void {
 
     rl.question("Monto: ", (monto) => {
 
+
         rl.question("Fecha (YYYY-MM-DD): ", (fecha) => {
+
 
             rl.question("ID del paciente: ", async (idPaciente) => {
 
 
+                if (
+                    monto.trim() === "" ||
+                    fecha.trim() === "" ||
+                    idPaciente.trim() === ""
+                ) {
+
+                    console.log("Error: No se permiten campos vacíos.");
+                    volverMenuPagos();
+                    return;
+
+                }
+
+
+                if (
+                    isNaN(Number(monto)) ||
+                    isNaN(Number(idPaciente))
+                ) {
+
+                    console.log("Error: Monto e ID deben ser valores numéricos.");
+                    volverMenuPagos();
+                    return;
+
+                }
+
+
+                const fechaValida = new Date(fecha);
+
+
+                if (isNaN(fechaValida.getTime())) {
+
+                    console.log("Error: La fecha ingresada no es válida.");
+                    volverMenuPagos();
+                    return;
+
+                }
+
+
                 try {
+
 
                     const pago = new Pago(
                         0,
                         Number(monto),
-                        new Date(fecha),
+                        fechaValida,
                         Number(idPaciente)
                     );
 
@@ -99,15 +135,16 @@ function agregarPago(): void {
 
                 volverMenuPagos();
 
+
             });
 
+
         });
+
 
     });
 
 }
-
-
 
 async function listarPagos(): Promise<void> {
 
@@ -132,8 +169,6 @@ async function listarPagos(): Promise<void> {
 
 }
 
-
-
 function buscarPago(): void {
 
     console.clear();
@@ -142,11 +177,39 @@ function buscarPago(): void {
     rl.question("Ingrese el ID del pago: ", async (id) => {
 
 
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuPagos();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuPagos();
+            return;
+
+        }
+
+
         try {
+
 
             const resultado = await pagoService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Pago no encontrado.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
 
 
         } catch (error) {
@@ -158,11 +221,10 @@ function buscarPago(): void {
 
         volverMenuPagos();
 
+
     });
 
 }
-
-
 
 function editarPago(): void {
 
@@ -181,13 +243,52 @@ function editarPago(): void {
                 rl.question("ID del paciente: ", async (idPaciente) => {
 
 
+                    if (
+                        idPago.trim() === "" ||
+                        monto.trim() === "" ||
+                        fecha.trim() === "" ||
+                        idPaciente.trim() === ""
+                    ) {
+
+                        console.log("Error: No se permiten campos vacíos.");
+                        volverMenuPagos();
+                        return;
+
+                    }
+
+
+                    if (
+                        isNaN(Number(idPago)) ||
+                        isNaN(Number(monto)) ||
+                        isNaN(Number(idPaciente))
+                    ) {
+
+                        console.log("Error: Los datos numéricos son inválidos.");
+                        volverMenuPagos();
+                        return;
+
+                    }
+
+
+                    const fechaValida = new Date(fecha);
+
+
+                    if (isNaN(fechaValida.getTime())) {
+
+                        console.log("Error: Fecha inválida.");
+                        volverMenuPagos();
+                        return;
+
+                    }
+
+
                     try {
 
 
                         const pago = new Pago(
                             Number(idPago),
                             Number(monto),
-                            new Date(fecha),
+                            fechaValida,
                             Number(idPaciente)
                         );
 
@@ -221,8 +322,6 @@ function editarPago(): void {
 
 }
 
-
-
 function eliminarPago(): void {
 
     console.clear();
@@ -231,7 +330,26 @@ function eliminarPago(): void {
     rl.question("Ingrese el ID del pago: ", async (id) => {
 
 
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuPagos();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuPagos();
+            return;
+
+        }
+
+
         try {
+
 
             await pagoService.eliminar(Number(id));
 
@@ -248,12 +366,9 @@ function eliminarPago(): void {
 
         volverMenuPagos();
 
-
     });
 
 }
-
-
 
 function volverMenuPagos(): void {
 
