@@ -5,6 +5,7 @@ import { mostrarMenu } from "./menu";
 
 const citaService = new CitaService();
 
+
 export function menuCitas(): void {
 
     console.clear();
@@ -19,7 +20,6 @@ export function menuCitas(): void {
     console.log("5. Eliminar cita");
     console.log("0. Regresar");
     console.log("====================================");
-
     rl.question("Seleccione una opción: ", async (opcion) => {
 
         switch (opcion) {
@@ -52,7 +52,6 @@ export function menuCitas(): void {
                 console.log("Opción inválida.");
                 setTimeout(menuCitas, 1500);
                 break;
-
         }
 
     });
@@ -62,6 +61,7 @@ export function menuCitas(): void {
 function agregarCita(): void {
 
     console.clear();
+
 
     rl.question("Fecha (AAAA-MM-DD): ", (fecha) => {
 
@@ -73,20 +73,53 @@ function agregarCita(): void {
 
                     rl.question("ID del consultorio: ", async (idConsultorio) => {
 
+
+                        if (
+                            fecha.trim() === "" ||
+                            hora.trim() === "" ||
+                            idPaciente.trim() === "" ||
+                            idDoctor.trim() === "" ||
+                            idConsultorio.trim() === ""
+                        ) {
+
+                            console.log("Error: No se permiten campos vacíos.");
+                            volverMenuCitas();
+                            return;
+
+                        }
+
+
+                        if (
+                            isNaN(Number(idPaciente)) ||
+                            isNaN(Number(idDoctor)) ||
+                            isNaN(Number(idConsultorio))
+                        ) {
+
+                            console.log("Error: Los IDs deben ser numéricos.");
+                            volverMenuCitas();
+                            return;
+
+                        }
+
+
                         try {
 
+
                             const cita = new Cita(
-                            0,
-                            new Date(fecha),
-                            hora,
-                            Number(idPaciente),
-                            Number(idDoctor),
-                            Number(idConsultorio)
+                                0,
+                                new Date(fecha),
+                                hora,
+                                Number(idPaciente),
+                                Number(idDoctor),
+                                Number(idConsultorio)
                             );
+
 
                             await citaService.agregar(cita);
 
+
                             console.log("Cita agregada correctamente.");
+
 
                         } catch (error) {
 
@@ -94,7 +127,9 @@ function agregarCita(): void {
 
                         }
 
+
                         volverMenuCitas();
+
 
                     });
 
@@ -112,17 +147,20 @@ async function listarCitas(): Promise<void> {
 
     console.clear();
 
+
     try {
 
         const resultado = await citaService.listar();
 
         console.table(resultado[0]);
 
+
     } catch (error) {
 
         console.error(error);
 
     }
+
 
     volverMenuCitas();
 
@@ -132,13 +170,44 @@ function buscarCita(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID de la cita: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuCitas();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuCitas();
+            return;
+
+        }
+
 
         try {
 
+
             const resultado = await citaService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Cita no encontrada.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
+
 
         } catch (error) {
 
@@ -146,7 +215,9 @@ function buscarCita(): void {
 
         }
 
+
         volverMenuCitas();
+
 
     });
 
@@ -155,6 +226,7 @@ function buscarCita(): void {
 function editarCita(): void {
 
     console.clear();
+
 
     rl.question("ID de la cita: ", (id) => {
 
@@ -168,7 +240,39 @@ function editarCita(): void {
 
                         rl.question("ID del consultorio: ", async (idConsultorio) => {
 
+
+                            if (
+                                id.trim() === "" ||
+                                fecha.trim() === "" ||
+                                hora.trim() === "" ||
+                                idPaciente.trim() === "" ||
+                                idDoctor.trim() === "" ||
+                                idConsultorio.trim() === ""
+                            ) {
+
+                                console.log("Error: No se permiten campos vacíos.");
+                                volverMenuCitas();
+                                return;
+
+                            }
+
+
+                            if (
+                                isNaN(Number(id)) ||
+                                isNaN(Number(idPaciente)) ||
+                                isNaN(Number(idDoctor)) ||
+                                isNaN(Number(idConsultorio))
+                            ) {
+
+                                console.log("Error: Los IDs deben ser numéricos.");
+                                volverMenuCitas();
+                                return;
+
+                            }
+
+
                             try {
+
 
                                 const cita = new Cita(
                                     Number(id),
@@ -179,9 +283,12 @@ function editarCita(): void {
                                     Number(idConsultorio)
                                 );
 
+
                                 await citaService.editar(cita);
 
+
                                 console.log("Cita actualizada correctamente.");
+
 
                             } catch (error) {
 
@@ -189,7 +296,9 @@ function editarCita(): void {
 
                             }
 
+
                             volverMenuCitas();
+
 
                         });
 
@@ -209,13 +318,36 @@ function eliminarCita(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID de la cita: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuCitas();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuCitas();
+            return;
+
+        }
+
 
         try {
 
+
             await citaService.eliminar(Number(id));
 
+
             console.log("Cita eliminada correctamente.");
+
 
         } catch (error) {
 
@@ -223,7 +355,9 @@ function eliminarCita(): void {
 
         }
 
+
         volverMenuCitas();
+
 
     });
 
