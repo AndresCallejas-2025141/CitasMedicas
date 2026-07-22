@@ -5,6 +5,7 @@ import { mostrarMenu } from "./menu";
 
 const doctorService = new DoctorService();
 
+
 export function menuDoctores(): void {
 
     console.clear();
@@ -19,7 +20,6 @@ export function menuDoctores(): void {
     console.log("5. Eliminar doctor");
     console.log("0. Regresar");
     console.log("====================================");
-
     rl.question("Seleccione una opción: ", async (opcion) => {
 
         switch (opcion) {
@@ -62,11 +62,36 @@ function agregarDoctor(): void {
 
     console.clear();
 
+
     rl.question("Nombre: ", (nombre) => {
+
 
         rl.question("ID de la especialidad: ", async (especialidadId) => {
 
+
+            if (
+                nombre.trim() === "" ||
+                especialidadId.trim() === ""
+            ) {
+
+                console.log("Error: No se permiten campos vacíos.");
+                volverMenuDoctores();
+                return;
+
+            }
+
+
+            if (isNaN(Number(especialidadId))) {
+
+                console.log("Error: El ID de la especialidad debe ser numérico.");
+                volverMenuDoctores();
+                return;
+
+            }
+
+
             try {
+
 
                 const doctor = new Doctor(
                     0,
@@ -74,9 +99,12 @@ function agregarDoctor(): void {
                     Number(especialidadId)
                 );
 
+
                 await doctorService.agregar(doctor);
 
+
                 console.log("Doctor agregado correctamente.");
+
 
             } catch (error) {
 
@@ -84,9 +112,12 @@ function agregarDoctor(): void {
 
             }
 
+
             volverMenuDoctores();
 
+
         });
+
 
     });
 
@@ -96,17 +127,20 @@ async function listarDoctores(): Promise<void> {
 
     console.clear();
 
+
     try {
 
         const resultado = await doctorService.listar();
 
         console.table(resultado[0]);
 
+
     } catch (error) {
 
         console.error(error);
 
     }
+
 
     volverMenuDoctores();
 
@@ -116,13 +150,44 @@ function buscarDoctor(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del doctor: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuDoctores();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuDoctores();
+            return;
+
+        }
+
 
         try {
 
+
             const resultado = await doctorService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Doctor no encontrado.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
+
 
         } catch (error) {
 
@@ -130,7 +195,9 @@ function buscarDoctor(): void {
 
         }
 
+
         volverMenuDoctores();
+
 
     });
 
@@ -140,13 +207,43 @@ function editarDoctor(): void {
 
     console.clear();
 
+
     rl.question("ID: ", (id) => {
+
 
         rl.question("Nombre: ", (nombre) => {
 
+
             rl.question("ID de la especialidad: ", async (especialidadId) => {
 
+
+                if (
+                    id.trim() === "" ||
+                    nombre.trim() === "" ||
+                    especialidadId.trim() === ""
+                ) {
+
+                    console.log("Error: No se permiten campos vacíos.");
+                    volverMenuDoctores();
+                    return;
+
+                }
+
+
+                if (
+                    isNaN(Number(id)) ||
+                    isNaN(Number(especialidadId))
+                ) {
+
+                    console.log("Error: Los IDs deben ser numéricos.");
+                    volverMenuDoctores();
+                    return;
+
+                }
+
+
                 try {
+
 
                     const doctor = new Doctor(
                         Number(id),
@@ -154,9 +251,12 @@ function editarDoctor(): void {
                         Number(especialidadId)
                     );
 
+
                     await doctorService.editar(doctor);
 
+
                     console.log("Doctor actualizado correctamente.");
+
 
                 } catch (error) {
 
@@ -164,11 +264,15 @@ function editarDoctor(): void {
 
                 }
 
+
                 volverMenuDoctores();
+
 
             });
 
+
         });
+
 
     });
 
@@ -178,13 +282,36 @@ function eliminarDoctor(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del doctor: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuDoctores();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuDoctores();
+            return;
+
+        }
+
 
         try {
 
+
             await doctorService.eliminar(Number(id));
 
+
             console.log("Doctor eliminado correctamente.");
+
 
         } catch (error) {
 
@@ -192,7 +319,9 @@ function eliminarDoctor(): void {
 
         }
 
+
         volverMenuDoctores();
+
 
     });
 
