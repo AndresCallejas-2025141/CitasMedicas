@@ -1,4 +1,5 @@
 import { rl } from "../readline";
+import { menuPacientes } from "./pacienteMenu";
 
 export function mostrarMenu(): void {
 
@@ -25,7 +26,7 @@ export function mostrarMenu(): void {
         switch (opcion) {
 
             case "1":
-                console.log("Menú Pacientes");
+                menuPacientes();
                 break;
 
             case "2":
