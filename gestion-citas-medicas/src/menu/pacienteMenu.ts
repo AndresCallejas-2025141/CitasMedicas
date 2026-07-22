@@ -5,6 +5,7 @@ import { mostrarMenu } from "./menu";
 
 const pacienteService = new PacienteService();
 
+
 export function menuPacientes(): void {
 
     console.clear();
@@ -19,8 +20,8 @@ export function menuPacientes(): void {
     console.log("5. Eliminar paciente");
     console.log("0. Regresar");
     console.log("====================================");
-
     rl.question("Seleccione una opción: ", async (opcion) => {
+
 
         switch (opcion) {
 
@@ -52,6 +53,7 @@ export function menuPacientes(): void {
                 console.log("Opción inválida.");
                 setTimeout(menuPacientes, 1500);
                 break;
+
         }
 
     });
@@ -62,13 +64,39 @@ function agregarPaciente(): void {
 
     console.clear();
 
+
     rl.question("Nombre: ", (nombre) => {
+
 
         rl.question("Teléfono: ", (telefono) => {
 
+
             rl.question("Correo: ", async (correo) => {
 
+
+                if (
+                    nombre.trim() === "" ||
+                    telefono.trim() === "" ||
+                    correo.trim() === ""
+                ) {
+
+                    console.log("Error: No se permiten campos vacíos.");
+                    volverMenuPacientes();
+                    return;
+
+                }
+
+
+                if (isNaN(Number(telefono))) {
+
+                    console.log("Error: El teléfono debe ser numérico.");
+                    volverMenuPacientes();
+                    return;
+
+                }
+
                 try {
+
 
                     const paciente = new Paciente(
                         0,
@@ -77,9 +105,12 @@ function agregarPaciente(): void {
                         correo
                     );
 
+
                     await pacienteService.agregar(paciente);
 
+
                     console.log("Paciente agregado correctamente.");
+
 
                 } catch (error) {
 
@@ -87,11 +118,15 @@ function agregarPaciente(): void {
 
                 }
 
+
                 volverMenuPacientes();
+
 
             });
 
+
         });
+
 
     });
 
@@ -101,17 +136,20 @@ async function listarPacientes(): Promise<void> {
 
     console.clear();
 
+
     try {
 
         const resultado = await pacienteService.listar();
 
         console.table(resultado[0]);
 
+
     } catch (error) {
 
         console.error(error);
 
     }
+
 
     volverMenuPacientes();
 
@@ -121,13 +159,44 @@ function buscarPaciente(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del paciente: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuPacientes();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuPacientes();
+            return;
+
+        }
+
 
         try {
 
+
             const resultado = await pacienteService.buscarPorId(Number(id));
 
-            console.table(resultado[0]);
+
+            if (resultado[0].length === 0) {
+
+                console.log("Error: Paciente no encontrado.");
+
+            } else {
+
+                console.table(resultado[0]);
+
+            }
+
 
         } catch (error) {
 
@@ -135,7 +204,9 @@ function buscarPaciente(): void {
 
         }
 
+
         volverMenuPacientes();
+
 
     });
 
@@ -145,15 +216,47 @@ function editarPaciente(): void {
 
     console.clear();
 
+
     rl.question("ID: ", (id) => {
+
 
         rl.question("Nombre: ", (nombre) => {
 
+
             rl.question("Teléfono: ", (telefono) => {
+
 
                 rl.question("Correo: ", async (correo) => {
 
+
+                    if (
+                        id.trim() === "" ||
+                        nombre.trim() === "" ||
+                        telefono.trim() === "" ||
+                        correo.trim() === ""
+                    ) {
+
+                        console.log("Error: No se permiten campos vacíos.");
+                        volverMenuPacientes();
+                        return;
+
+                    }
+
+
+                    if (
+                        isNaN(Number(id)) ||
+                        isNaN(Number(telefono))
+                    ) {
+
+                        console.log("Error: ID y teléfono deben ser numéricos.");
+                        volverMenuPacientes();
+                        return;
+
+                    }
+
+
                     try {
+
 
                         const paciente = new Paciente(
                             Number(id),
@@ -162,9 +265,12 @@ function editarPaciente(): void {
                             correo
                         );
 
+
                         await pacienteService.editar(paciente);
 
-                        console.log("\nPaciente actualizado correctamente.");
+
+                        console.log("Paciente actualizado correctamente.");
+
 
                     } catch (error) {
 
@@ -172,13 +278,18 @@ function editarPaciente(): void {
 
                     }
 
+
                     volverMenuPacientes();
+
 
                 });
 
+
             });
 
+
         });
+
 
     });
 
@@ -188,13 +299,35 @@ function eliminarPaciente(): void {
 
     console.clear();
 
+
     rl.question("Ingrese el ID del paciente: ", async (id) => {
+
+
+        if (id.trim() === "") {
+
+            console.log("Error: El ID no puede estar vacío.");
+            volverMenuPacientes();
+            return;
+
+        }
+
+
+        if (isNaN(Number(id))) {
+
+            console.log("Error: El ID debe ser numérico.");
+            volverMenuPacientes();
+            return;
+
+        }
 
         try {
 
+
             await pacienteService.eliminar(Number(id));
 
+
             console.log("Paciente eliminado correctamente.");
+
 
         } catch (error) {
 
@@ -202,7 +335,9 @@ function eliminarPaciente(): void {
 
         }
 
+
         volverMenuPacientes();
+
 
     });
 
