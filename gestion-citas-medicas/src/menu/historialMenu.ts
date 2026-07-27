@@ -282,51 +282,37 @@ function eliminarHistorial(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID del historial: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuHistorial();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuHistorial();
             return;
-
         }
-
 
         try {
 
-
             await historialService.eliminar(Number(id));
-
 
             console.log("Historial eliminado correctamente.");
 
+        } catch (error: any) {
 
-        } catch (error) {
-
-            console.error(error);
+            console.log("Error:", error.message);
 
         }
 
-
         volverMenuHistorial();
-
 
     });
 
 }
-
 function volverMenuHistorial(): void {
 
     rl.question("Presione ENTER para continuar...", () => {
