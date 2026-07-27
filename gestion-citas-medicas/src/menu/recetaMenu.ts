@@ -308,45 +308,33 @@ function eliminarReceta(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID de la receta: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuRecetas();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuRecetas();
             return;
-
         }
 
         try {
 
-
             await recetaService.eliminar(Number(id));
-
 
             console.log("Receta eliminada correctamente.");
 
+        } catch (error: any) {
 
-        } catch (error) {
-
-            console.error(error);
+            console.log("Error:", error.message);
 
         }
 
-
         volverMenuRecetas();
-
 
     });
 
