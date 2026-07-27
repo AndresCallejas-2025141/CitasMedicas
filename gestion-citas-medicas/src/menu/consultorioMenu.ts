@@ -270,49 +270,35 @@ function eliminarConsultorio(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID del consultorio: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuConsultorios();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuConsultorios();
             return;
-
         }
-
 
         try {
 
-
             await consultorioService.eliminar(Number(id));
-
 
             console.log("Consultorio eliminado correctamente.");
 
-
         } catch (error) {
 
-            console.error(error);
+            console.log("Error: No se encontró un consultorio con ese ID.");
 
         }
 
-
         volverMenuConsultorios();
 
-
     });
-
 }
 
 function volverMenuConsultorios(): void {
