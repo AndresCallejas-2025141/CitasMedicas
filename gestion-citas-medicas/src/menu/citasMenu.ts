@@ -318,46 +318,33 @@ function eliminarCita(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID de la cita: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuCitas();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuCitas();
             return;
-
         }
-
 
         try {
 
-
             await citaService.eliminar(Number(id));
-
 
             console.log("Cita eliminada correctamente.");
 
+        } catch (error: any) {
 
-        } catch (error) {
-
-            console.error(error);
+            console.log("Error:", error.message);
 
         }
 
-
         volverMenuCitas();
-
 
     });
 
