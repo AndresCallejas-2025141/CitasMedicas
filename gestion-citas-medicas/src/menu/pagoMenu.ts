@@ -326,43 +326,31 @@ function eliminarPago(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID del pago: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuPagos();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuPagos();
             return;
-
         }
-
 
         try {
 
-
             await pagoService.eliminar(Number(id));
-
 
             console.log("Pago eliminado correctamente.");
 
+        } catch (error: any) {
 
-        } catch (error) {
-
-            console.error(error);
+            console.log("Error:", error.message);
 
         }
-
 
         volverMenuPagos();
 
