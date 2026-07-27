@@ -290,9 +290,9 @@ function eliminarConsultorio(): void {
 
             console.log("Consultorio eliminado correctamente.");
 
-        } catch (error) {
+        } catch (error: any) {
 
-            console.log("Error: No se encontró un consultorio con ese ID.");
+            console.log("Error:", error.message);
 
         }
 
