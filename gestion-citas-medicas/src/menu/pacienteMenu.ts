@@ -299,45 +299,33 @@ function eliminarPaciente(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID del paciente: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuPacientes();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuPacientes();
             return;
-
         }
 
         try {
 
-
             await pacienteService.eliminar(Number(id));
-
 
             console.log("Paciente eliminado correctamente.");
 
+        } catch (error: any) {
 
-        } catch (error) {
-
-            console.error(error);
+            console.log("Error:", error.message);
 
         }
 
-
         volverMenuPacientes();
-
 
     });
 
