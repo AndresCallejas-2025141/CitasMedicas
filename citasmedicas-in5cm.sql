@@ -78,270 +78,961 @@ create table historial (
     foreign key (id_paciente) references paciente(id_paciente)
 );
 
-delimiter $$
+DELIMITER $$
 
-create procedure listar_paciente()
-begin
-    select * from paciente;
-end $$
+-- =====================================================
+-- PACIENTE
+-- =====================================================
 
-create procedure agregar_paciente(in p_nombre varchar(100), in p_telefono varchar(20), in p_correo varchar(100))
-begin
-    insert into paciente(nombre, telefono, correo) values(p_nombre, p_telefono, p_correo);
-end $$
+CREATE PROCEDURE listar_paciente()
+BEGIN
+    SELECT * FROM paciente;
+END $$
 
-create procedure editar_paciente(in p_id int, in p_nombre varchar(100), in p_telefono varchar(20), in p_correo varchar(100))
-begin
-    update paciente set nombre=p_nombre, telefono=p_telefono, correo=p_correo where id_paciente=p_id;
-end $$
+CREATE PROCEDURE agregar_paciente(
+    IN p_nombre VARCHAR(100),
+    IN p_telefono VARCHAR(20),
+    IN p_correo VARCHAR(100)
+)
+BEGIN
+    INSERT INTO paciente(nombre, telefono, correo)
+    VALUES(p_nombre, p_telefono, p_correo);
+END $$
 
-create procedure eliminar_paciente(in p_id int)
-begin
-    delete from paciente where id_paciente=p_id;
-end $$
+CREATE PROCEDURE editar_paciente(
+    IN p_id INT,
+    IN p_nombre VARCHAR(100),
+    IN p_telefono VARCHAR(20),
+    IN p_correo VARCHAR(100)
+)
+BEGIN
 
-create procedure buscar_paciente_id(in p_id int)
-begin
-    select * from paciente where id_paciente=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
 
+    UPDATE paciente
+    SET nombre = p_nombre,
+        telefono = p_telefono,
+        correo = p_correo
+    WHERE id_paciente = p_id;
 
-create procedure listar_doctor()
-begin
-    select * from doctor;
-end $$
+END $$
 
-create procedure agregar_doctor(in p_nombre varchar(100), in p_especialidad int)
-begin
-    insert into doctor(nombre, especialidad_id) values(p_nombre, p_especialidad);
-end $$
+CREATE PROCEDURE eliminar_paciente(IN p_id INT)
+BEGIN
 
-create procedure editar_doctor(in p_id int, in p_nombre varchar(100), in p_especialidad int)
-begin
-    update doctor set nombre=p_nombre, especialidad_id=p_especialidad where id_doctor=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
 
-create procedure eliminar_doctor(in p_id int)
-begin
-    delete from doctor where id_doctor=p_id;
-end $$
+    DELETE FROM paciente
+    WHERE id_paciente = p_id;
 
-create procedure buscar_doctor_id(in p_id int)
-begin
-    select * from doctor where id_doctor=p_id;
-end $$
+END $$
 
+CREATE PROCEDURE buscar_paciente_id(IN p_id INT)
+BEGIN
 
-create procedure listar_especialidad()
-begin
-    select * from especialidad;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
 
-create procedure agregar_especialidad(in p_nombre varchar(100))
-begin
-    insert into especialidad(nombre) values(p_nombre);
-end $$
+    SELECT * FROM paciente
+    WHERE id_paciente = p_id;
 
-create procedure editar_especialidad(in p_id int, in p_nombre varchar(100))
-begin
-    update especialidad set nombre=p_nombre where id_especialidad=p_id;
-end $$
-
-create procedure eliminar_especialidad(in p_id int)
-begin
-    delete from especialidad where id_especialidad=p_id;
-end $$
-
-create procedure buscar_especialidad_id(in p_id int)
-begin
-    select * from especialidad where id_especialidad=p_id;
-end $$
+END $$
 
 
-create procedure listar_consultorio()
-begin
-    select * from consultorio;
-end $$
+-- =====================================================
+-- DOCTOR
+-- =====================================================
 
-create procedure agregar_consultorio(in p_numero varchar(10), in p_ubicacion varchar(100))
-begin
-    insert into consultorio(numero, ubicacion) values(p_numero, p_ubicacion);
-end $$
+CREATE PROCEDURE listar_doctor()
+BEGIN
+    SELECT * FROM doctor;
+END $$
 
-create procedure editar_consultorio(in p_id int, in p_numero varchar(10), in p_ubicacion varchar(100))
-begin
-    update consultorio set numero=p_numero, ubicacion=p_ubicacion where id_consultorio=p_id;
-end $$
+CREATE PROCEDURE agregar_doctor(
+    IN p_nombre VARCHAR(100),
+    IN p_especialidad INT
+)
+BEGIN
 
-create procedure eliminar_consultorio(in p_id int)
-begin
-    delete from consultorio where id_consultorio=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM especialidad
+        WHERE id_especialidad = p_especialidad
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La especialidad no existe';
+    END IF;
 
-create procedure buscar_consultorio_id(in p_id int)
-begin
-    select * from consultorio where id_consultorio=p_id;
-end $$
+    INSERT INTO doctor(nombre, especialidad_id)
+    VALUES(p_nombre, p_especialidad);
 
+END $$
 
-create procedure listar_cita()
-begin
-    select * from cita;
-end $$
+CREATE PROCEDURE editar_doctor(
+    IN p_id INT,
+    IN p_nombre VARCHAR(100),
+    IN p_especialidad INT
+)
+BEGIN
 
-create procedure agregar_cita(in p_fecha date, in p_hora time, in p_paciente int, in p_doctor int, in p_consultorio int)
-begin
-    insert into cita(fecha, hora, id_paciente, id_doctor, id_consultorio)
-    values(p_fecha, p_hora, p_paciente, p_doctor, p_consultorio);
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM doctor
+        WHERE id_doctor = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El doctor no existe';
+    END IF;
 
-create procedure editar_cita(in p_id int, in p_fecha date, in p_hora time, in p_paciente int, in p_doctor int, in p_consultorio int)
-begin
-    update cita set fecha=p_fecha, hora=p_hora, id_paciente=p_paciente, id_doctor=p_doctor, id_consultorio=p_consultorio where id_cita=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM especialidad
+        WHERE id_especialidad = p_especialidad
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La especialidad no existe';
+    END IF;
 
-create procedure eliminar_cita(in p_id int)
-begin
-    delete from cita where id_cita=p_id;
-end $$
+    UPDATE doctor
+    SET nombre = p_nombre,
+        especialidad_id = p_especialidad
+    WHERE id_doctor = p_id;
 
-create procedure buscar_cita_id(in p_id int)
-begin
-    select * from cita where id_cita=p_id;
-end $$
+END $$
 
+CREATE PROCEDURE eliminar_doctor(IN p_id INT)
+BEGIN
 
-create procedure listar_horario()
-begin
-    select * from horario;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM doctor
+        WHERE id_doctor = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El doctor no existe';
+    END IF;
 
-create procedure agregar_horario(in p_dia varchar(20), in p_inicio time, in p_fin time, in p_doctor int)
-begin
-    insert into horario(dia, hora_inicio, hora_fin, id_doctor)
-    values(p_dia, p_inicio, p_fin, p_doctor);
-end $$
+    DELETE FROM doctor
+    WHERE id_doctor = p_id;
 
-create procedure editar_horario(in p_id int, in p_dia varchar(20), in p_inicio time, in p_fin time, in p_doctor int)
-begin
-    update horario set dia=p_dia, hora_inicio=p_inicio, hora_fin=p_fin, id_doctor=p_doctor where id_horario=p_id;
-end $$
+END $$
 
-create procedure eliminar_horario(in p_id int)
-begin
-    delete from horario where id_horario=p_id;
-end $$
+CREATE PROCEDURE buscar_doctor_id(IN p_id INT)
+BEGIN
 
-create procedure buscar_horario_id(in p_id int)
-begin
-    select * from horario where id_horario=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM doctor
+        WHERE id_doctor = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El doctor no existe';
+    END IF;
 
+    SELECT * FROM doctor
+    WHERE id_doctor = p_id;
 
-create procedure listar_receta()
-begin
-    select * from receta;
-end $$
-
-create procedure agregar_receta(in p_fecha date, in p_cita int)
-begin
-    insert into receta(fecha, id_cita) values(p_fecha, p_cita);
-end $$
-
-create procedure editar_receta(in p_id int, in p_fecha date, in p_cita int)
-begin
-    update receta set fecha=p_fecha, id_cita=p_cita where id_receta=p_id;
-end $$
-
-create procedure eliminar_receta(in p_id int)
-begin
-    delete from receta where id_receta=p_id;
-end $$
-
-create procedure buscar_receta_id(in p_id int)
-begin
-    select * from receta where id_receta=p_id;
-end $$
+END $$
 
 
-create procedure listar_medicamento()
-begin
-    select * from medicamento;
-end $$
+-- =====================================================
+-- ESPECIALIDAD
+-- =====================================================
 
-create procedure agregar_medicamento(in p_nombre varchar(100), in p_dosis varchar(100), in p_receta int)
-begin
-    insert into medicamento(nombre, dosis, id_receta) values(p_nombre, p_dosis, p_receta);
-end $$
+CREATE PROCEDURE listar_especialidad()
+BEGIN
+    SELECT * FROM especialidad;
+END $$
 
-create procedure editar_medicamento(in p_id int, in p_nombre varchar(100), in p_dosis varchar(100), in p_receta int)
-begin
-    update medicamento set nombre=p_nombre, dosis=p_dosis, id_receta=p_receta where id_medicamento=p_id;
-end $$
+CREATE PROCEDURE agregar_especialidad(
+    IN p_nombre VARCHAR(100)
+)
+BEGIN
+    INSERT INTO especialidad(nombre)
+    VALUES(p_nombre);
+END $$
 
-create procedure eliminar_medicamento(in p_id int)
-begin
-    delete from medicamento where id_medicamento=p_id;
-end $$
+CREATE PROCEDURE editar_especialidad(
+    IN p_id INT,
+    IN p_nombre VARCHAR(100)
+)
+BEGIN
 
-create procedure buscar_medicamento_id(in p_id int)
-begin
-    select * from medicamento where id_medicamento=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM especialidad
+        WHERE id_especialidad = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La especialidad no existe';
+    END IF;
+
+    UPDATE especialidad
+    SET nombre = p_nombre
+    WHERE id_especialidad = p_id;
+
+END $$
+
+CREATE PROCEDURE eliminar_especialidad(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM especialidad
+        WHERE id_especialidad = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La especialidad no existe';
+    END IF;
+
+    DELETE FROM especialidad
+    WHERE id_especialidad = p_id;
+
+END $$
+
+CREATE PROCEDURE buscar_especialidad_id(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM especialidad
+        WHERE id_especialidad = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La especialidad no existe';
+    END IF;
+
+    SELECT * FROM especialidad
+    WHERE id_especialidad = p_id;
+
+END $$
 
 
-create procedure listar_pago()
-begin
-    select * from pago;
-end $$
+-- =====================================================
+-- CONSULTORIO
+-- =====================================================
 
-create procedure agregar_pago(in p_monto decimal(10,2), in p_fecha date, in p_paciente int)
-begin
-    insert into pago(monto, fecha, id_paciente) values(p_monto, p_fecha, p_paciente);
-end $$
+CREATE PROCEDURE listar_consultorio()
+BEGIN
+    SELECT * FROM consultorio;
+END $$
 
-create procedure editar_pago(in p_id int, in p_monto decimal(10,2), in p_fecha date, in p_paciente int)
-begin
-    update pago set monto=p_monto, fecha=p_fecha, id_paciente=p_paciente where id_pago=p_id;
-end $$
+CREATE PROCEDURE agregar_consultorio(
+    IN p_numero VARCHAR(10),
+    IN p_ubicacion VARCHAR(100)
+)
+BEGIN
+    INSERT INTO consultorio(numero, ubicacion)
+    VALUES(p_numero, p_ubicacion);
+END $$
 
-create procedure eliminar_pago(in p_id int)
-begin
-    delete from pago where id_pago=p_id;
-end $$
+CREATE PROCEDURE editar_consultorio(
+    IN p_id INT,
+    IN p_numero VARCHAR(10),
+    IN p_ubicacion VARCHAR(100)
+)
+BEGIN
 
-create procedure buscar_pago_id(in p_id int)
-begin
-    select * from pago where id_pago=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM consultorio
+        WHERE id_consultorio = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El consultorio no existe';
+    END IF;
+
+    UPDATE consultorio
+    SET numero = p_numero,
+        ubicacion = p_ubicacion
+    WHERE id_consultorio = p_id;
+
+END $$
+
+CREATE PROCEDURE eliminar_consultorio(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM consultorio
+        WHERE id_consultorio = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El consultorio no existe';
+    END IF;
+
+    DELETE FROM consultorio
+    WHERE id_consultorio = p_id;
+
+END $$
+
+CREATE PROCEDURE buscar_consultorio_id(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM consultorio
+        WHERE id_consultorio = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El consultorio no existe';
+    END IF;
+
+    SELECT * FROM consultorio
+    WHERE id_consultorio = p_id;
+
+END $$
 
 
-create procedure listar_historial()
-begin
-    select * from historial;
-end $$
+-- =====================================================
+-- CITA
+-- =====================================================
 
-create procedure agregar_historial(in p_descripcion text, in p_paciente int)
-begin
-    insert into historial(descripcion, id_paciente) values(p_descripcion, p_paciente);
-end $$
+CREATE PROCEDURE listar_cita()
+BEGIN
+    SELECT * FROM cita;
+END $$
 
-create procedure editar_historial(in p_id int, in p_descripcion text, in p_paciente int)
-begin
-    update historial set descripcion=p_descripcion, id_paciente=p_paciente where id_historial=p_id;
-end $$
+CREATE PROCEDURE agregar_cita(
+    IN p_fecha DATE,
+    IN p_hora TIME,
+    IN p_paciente INT,
+    IN p_doctor INT,
+    IN p_consultorio INT
+)
+BEGIN
 
-create procedure eliminar_historial(in p_id int)
-begin
-    delete from historial where id_historial=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_paciente
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
 
-create procedure buscar_historial_id(in p_id int)
-begin
-    select * from historial where id_historial=p_id;
-end $$
+    IF NOT EXISTS (
+        SELECT 1 FROM doctor
+        WHERE id_doctor = p_doctor
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El doctor no existe';
+    END IF;
 
-delimiter ;
+    IF NOT EXISTS (
+        SELECT 1 FROM consultorio
+        WHERE id_consultorio = p_consultorio
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El consultorio no existe';
+    END IF;
+
+    INSERT INTO cita(
+        fecha,
+        hora,
+        id_paciente,
+        id_doctor,
+        id_consultorio
+    )
+    VALUES(
+        p_fecha,
+        p_hora,
+        p_paciente,
+        p_doctor,
+        p_consultorio
+    );
+
+END $$
+
+CREATE PROCEDURE editar_cita(
+    IN p_id INT,
+    IN p_fecha DATE,
+    IN p_hora TIME,
+    IN p_paciente INT,
+    IN p_doctor INT,
+    IN p_consultorio INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM cita
+        WHERE id_cita = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La cita no existe';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_paciente
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM doctor
+        WHERE id_doctor = p_doctor
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El doctor no existe';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM consultorio
+        WHERE id_consultorio = p_consultorio
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El consultorio no existe';
+    END IF;
+
+    UPDATE cita
+    SET fecha = p_fecha,
+        hora = p_hora,
+        id_paciente = p_paciente,
+        id_doctor = p_doctor,
+        id_consultorio = p_consultorio
+    WHERE id_cita = p_id;
+
+END $$
+
+CREATE PROCEDURE eliminar_cita(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM cita
+        WHERE id_cita = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La cita no existe';
+    END IF;
+
+    DELETE FROM cita
+    WHERE id_cita = p_id;
+
+END $$
+
+CREATE PROCEDURE buscar_cita_id(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM cita
+        WHERE id_cita = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La cita no existe';
+    END IF;
+
+    SELECT * FROM cita
+    WHERE id_cita = p_id;
+
+END $$
+
+
+-- =====================================================
+-- HORARIO
+-- =====================================================
+
+CREATE PROCEDURE listar_horario()
+BEGIN
+    SELECT * FROM horario;
+END $$
+
+CREATE PROCEDURE agregar_horario(
+    IN p_dia VARCHAR(20),
+    IN p_inicio TIME,
+    IN p_fin TIME,
+    IN p_doctor INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM doctor
+        WHERE id_doctor = p_doctor
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El doctor no existe';
+    END IF;
+
+    INSERT INTO horario(
+        dia,
+        hora_inicio,
+        hora_fin,
+        id_doctor
+    )
+    VALUES(
+        p_dia,
+        p_inicio,
+        p_fin,
+        p_doctor
+    );
+
+END $$
+
+CREATE PROCEDURE editar_horario(
+    IN p_id INT,
+    IN p_dia VARCHAR(20),
+    IN p_inicio TIME,
+    IN p_fin TIME,
+    IN p_doctor INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM horario
+        WHERE id_horario = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El horario no existe';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM doctor
+        WHERE id_doctor = p_doctor
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El doctor no existe';
+    END IF;
+
+    UPDATE horario
+    SET dia = p_dia,
+        hora_inicio = p_inicio,
+        hora_fin = p_fin,
+        id_doctor = p_doctor
+    WHERE id_horario = p_id;
+
+END $$
+
+CREATE PROCEDURE eliminar_horario(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM horario
+        WHERE id_horario = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El horario no existe';
+    END IF;
+
+    DELETE FROM horario
+    WHERE id_horario = p_id;
+
+END $$
+
+CREATE PROCEDURE buscar_horario_id(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM horario
+        WHERE id_horario = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El horario no existe';
+    END IF;
+
+    SELECT * FROM horario
+    WHERE id_horario = p_id;
+
+END $$
+
+
+-- =====================================================
+-- RECETA
+-- =====================================================
+
+CREATE PROCEDURE listar_receta()
+BEGIN
+    SELECT * FROM receta;
+END $$
+
+CREATE PROCEDURE agregar_receta(
+    IN p_fecha DATE,
+    IN p_cita INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM cita
+        WHERE id_cita = p_cita
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La cita no existe';
+    END IF;
+
+    INSERT INTO receta(fecha, id_cita)
+    VALUES(p_fecha, p_cita);
+
+END $$
+
+CREATE PROCEDURE editar_receta(
+    IN p_id INT,
+    IN p_fecha DATE,
+    IN p_cita INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM receta
+        WHERE id_receta = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La receta no existe';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM cita
+        WHERE id_cita = p_cita
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La cita no existe';
+    END IF;
+
+    UPDATE receta
+    SET fecha = p_fecha,
+        id_cita = p_cita
+    WHERE id_receta = p_id;
+
+END $$
+
+CREATE PROCEDURE eliminar_receta(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM receta
+        WHERE id_receta = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La receta no existe';
+    END IF;
+
+    DELETE FROM receta
+    WHERE id_receta = p_id;
+
+END $$
+
+CREATE PROCEDURE buscar_receta_id(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM receta
+        WHERE id_receta = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La receta no existe';
+    END IF;
+
+    SELECT * FROM receta
+    WHERE id_receta = p_id;
+
+END $$
+
+
+-- =====================================================
+-- MEDICAMENTO
+-- =====================================================
+
+CREATE PROCEDURE listar_medicamento()
+BEGIN
+    SELECT * FROM medicamento;
+END $$
+
+CREATE PROCEDURE agregar_medicamento(
+    IN p_nombre VARCHAR(100),
+    IN p_dosis VARCHAR(100),
+    IN p_receta INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM receta
+        WHERE id_receta = p_receta
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La receta no existe';
+    END IF;
+
+    INSERT INTO medicamento(
+        nombre,
+        dosis,
+        id_receta
+    )
+    VALUES(
+        p_nombre,
+        p_dosis,
+        p_receta
+    );
+
+END $$
+
+CREATE PROCEDURE editar_medicamento(
+    IN p_id INT,
+    IN p_nombre VARCHAR(100),
+    IN p_dosis VARCHAR(100),
+    IN p_receta INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM medicamento
+        WHERE id_medicamento = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El medicamento no existe';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM receta
+        WHERE id_receta = p_receta
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La receta no existe';
+    END IF;
+
+    UPDATE medicamento
+    SET nombre = p_nombre,
+        dosis = p_dosis,
+        id_receta = p_receta
+    WHERE id_medicamento = p_id;
+
+END $$
+
+CREATE PROCEDURE eliminar_medicamento(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM medicamento
+        WHERE id_medicamento = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El medicamento no existe';
+    END IF;
+
+    DELETE FROM medicamento
+    WHERE id_medicamento = p_id;
+
+END $$
+
+CREATE PROCEDURE buscar_medicamento_id(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM medicamento
+        WHERE id_medicamento = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El medicamento no existe';
+    END IF;
+
+    SELECT * FROM medicamento
+    WHERE id_medicamento = p_id;
+
+END $$
+
+
+-- =====================================================
+-- PAGO
+-- =====================================================
+
+CREATE PROCEDURE listar_pago()
+BEGIN
+    SELECT * FROM pago;
+END $$
+
+CREATE PROCEDURE agregar_pago(
+    IN p_monto DECIMAL(10,2),
+    IN p_fecha DATE,
+    IN p_paciente INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_paciente
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
+
+    INSERT INTO pago(
+        monto,
+        fecha,
+        id_paciente
+    )
+    VALUES(
+        p_monto,
+        p_fecha,
+        p_paciente
+    );
+
+END $$
+
+CREATE PROCEDURE editar_pago(
+    IN p_id INT,
+    IN p_monto DECIMAL(10,2),
+    IN p_fecha DATE,
+    IN p_paciente INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pago
+        WHERE id_pago = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El pago no existe';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_paciente
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
+
+    UPDATE pago
+    SET monto = p_monto,
+        fecha = p_fecha,
+        id_paciente = p_paciente
+    WHERE id_pago = p_id;
+
+END $$
+
+CREATE PROCEDURE eliminar_pago(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pago
+        WHERE id_pago = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El pago no existe';
+    END IF;
+
+    DELETE FROM pago
+    WHERE id_pago = p_id;
+
+END $$
+
+CREATE PROCEDURE buscar_pago_id(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pago
+        WHERE id_pago = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El pago no existe';
+    END IF;
+
+    SELECT * FROM pago
+    WHERE id_pago = p_id;
+
+END $$
+
+
+-- =====================================================
+-- HISTORIAL
+-- =====================================================
+
+CREATE PROCEDURE listar_historial()
+BEGIN
+    SELECT * FROM historial;
+END $$
+
+CREATE PROCEDURE agregar_historial(
+    IN p_descripcion TEXT,
+    IN p_paciente INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_paciente
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
+
+    INSERT INTO historial(
+        descripcion,
+        id_paciente
+    )
+    VALUES(
+        p_descripcion,
+        p_paciente
+    );
+
+END $$
+
+CREATE PROCEDURE editar_historial(
+    IN p_id INT,
+    IN p_descripcion TEXT,
+    IN p_paciente INT
+)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM historial
+        WHERE id_historial = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El historial no existe';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM paciente
+        WHERE id_paciente = p_paciente
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente no existe';
+    END IF;
+
+    UPDATE historial
+    SET descripcion = p_descripcion,
+        id_paciente = p_paciente
+    WHERE id_historial = p_id;
+
+END $$
+
+CREATE PROCEDURE eliminar_historial(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM historial
+        WHERE id_historial = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El historial no existe';
+    END IF;
+
+    DELETE FROM historial
+    WHERE id_historial = p_id;
+
+END $$
+
+CREATE PROCEDURE buscar_historial_id(IN p_id INT)
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1 FROM historial
+        WHERE id_historial = p_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El historial no existe';
+    END IF;
+
+    SELECT * FROM historial
+    WHERE id_historial = p_id;
+
+END $$
+
+DELIMITER ;
 
 -- PACIENTES
 CALL agregar_paciente('Juan Pérez','55551234','juanperez@gmail.com');
