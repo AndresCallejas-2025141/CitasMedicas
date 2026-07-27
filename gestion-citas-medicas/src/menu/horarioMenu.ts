@@ -330,51 +330,37 @@ function eliminarHorario(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID del horario: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuHorarios();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuHorarios();
             return;
-
         }
-
 
         try {
 
-
             await horarioService.eliminar(Number(id));
-
 
             console.log("Horario eliminado correctamente.");
 
+        } catch (error: any) {
 
-        } catch (error) {
-
-            console.error(error);
+            console.log("Error:", error.message);
 
         }
 
-
         volverMenuHorarios();
-
 
     });
 
 }
-
 function validarHora(hora: string): boolean {
 
     const formato = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
