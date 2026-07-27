@@ -300,46 +300,33 @@ function eliminarMedicamento(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID del medicamento: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuMedicamentos();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuMedicamentos();
             return;
-
         }
-
 
         try {
 
-
             await medicamentoService.eliminar(Number(id));
-
 
             console.log("Medicamento eliminado correctamente.");
 
+        } catch (error: any) {
 
-        } catch (error) {
-
-            console.error(error);
+            console.log("Error:", error.message);
 
         }
 
-
         volverMenuMedicamentos();
-
 
     });
 
