@@ -254,46 +254,33 @@ function eliminarEspecialidad(): void {
 
     console.clear();
 
-
     rl.question("Ingrese el ID de la especialidad: ", async (id) => {
 
-
         if (id.trim() === "") {
-
             console.log("Error: El ID no puede estar vacío.");
             volverMenuEspecialidades();
             return;
-
         }
 
-
         if (isNaN(Number(id))) {
-
             console.log("Error: El ID debe ser numérico.");
             volverMenuEspecialidades();
             return;
-
         }
-
 
         try {
 
-
             await especialidadService.eliminar(Number(id));
-
 
             console.log("Especialidad eliminada correctamente.");
 
+        } catch (error: any) {
 
-        } catch (error) {
-
-            console.error(error);
+            console.log("Error:", error.message);
 
         }
 
-
         volverMenuEspecialidades();
-
 
     });
 
